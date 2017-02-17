@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iqmsoft.boot.mybatis.repository.mybatis.BookMapper">
+
+    <resultMap id="book" type="Book">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="author" column="author"/>
+        <result property="price" column="price"/>
+        <result property="topic" column="topic"/>
+        <result property="publishDate" column="publish_date"/>
+        <result property="bookStoreId" column="book_store_id"/>
+    </resultMap>
+
+    <resultMap id="bookWithBookStore" type="BookWithBookStore">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="author" column="author"/>
+        <result property="price" column="price"/>
+        <result property="topic" column="topic"/>
+        <result property="publishDate" column="publish_date"/>
+        <result property="bookStoreId" column="book_store_id"/>
+        <association property="bookStore" javaType="BookStore" resultMap="com.iqmsoft.boot.mybatis.repository.mybatis.BookStoreMapper.bookStore" columnPrefix="book_store_"/>
+    </resultMap>
+
+    <insert id="insertBook" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+          book (book_store_id, name, author, price, topic, publish_date)
+        VALUES
+          (#{bookStoreId}, #{name}, #{author}, #{price}, #{topic}, #{publishDate})
+    </insert>
+
+    <update id="updateBookOnNameById">
+        UPDATE
+          book
+        SET
+          name = #{name}
+        WHERE
+          id = #{id}
+    </update>
+
+    <delete id="deleteBookById">
+        DELETE FROM
+          book
+        WHERE
+          id = #{id}
+    </delete>
+
+    <select id="selectBookById" resultMap="book">
+        SELECT
+          *
+        FROM
+          book
+        WHERE
+          id = #{id}
+    </select>
+
+    <select id="selectBooksByAuthor" resultMap="book">
+        SELECT
+          *
+        FROM
+          book
+        WHERE
+          author = #{author}
+    </select>
+
+    <select id="selectBooksByLowPriceAndHighPrice" resultMap="book">
+        SELECT
+          *
+        FROM
+          book
+        WHERE
+          price BETWEEN #{lowPrice} AND #{highPrice}
+    </select>
+
+    <select id="selectAllBooks" resultMap="book">
+        SELECT
+          *
+        FROM
+          book
+    </select>
+
+    <select id="selectBooksByPage" resultMap="book">
+        SELECT
+          *
+        FROM
+          book
+        LIMIT #{offset}, #{perPage}
+    </select>
+
+    <select id="selectBookWithBookStoreById" resultMap="bookWithBookStore">
+        SELECT
+          book.*,
+          book_store.id AS book_store_id,
+          book_store.name AS book_store_name,
+          book_store.address AS book_store_address
+        FROM
+          book
+        LEFT JOIN
+          book_store ON book.book_store_id = book_store.id
+        WHERE
+          id = #{id}
+    </select>
+
+    <select id="selectCount" resultType="integer">
+        SELECT
+          COUNT(*)
+        FROM
+          book
+    </select>
+
+</mapper>
